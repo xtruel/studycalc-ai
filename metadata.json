@@ -1,0 +1,5 @@
+{
+  "name": "StudyCalc AI",
+  "description": "Calcolatrice intelligente offline ad altissima precisione (oltre 133 cifre decimali, niente errori di arrotondamento). Risolve passo passo espressioni, equazioni di 1° e 2° grado e legge gli esercizi dalle foto con OCR on-device. Nessuna chiave API, nessun abbonamento, nessun dato inviato in rete.",
+  "requestFramePermissions": ["camera"]
+}
