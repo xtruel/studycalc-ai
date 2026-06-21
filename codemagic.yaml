@@ -23,10 +23,6 @@ workflows:
           rm -rf ios
           npx cap add ios
           npx cap sync ios
-      - name: Forza Bundle ID corretto
-        script: |
-          sed -i '' "s/com\.getcapacitor\.App/$BUNDLE_ID/g" ios/App/App.xcodeproj/project.pbxproj
-          grep -m1 PRODUCT_BUNDLE_IDENTIFIER ios/App/App.xcodeproj/project.pbxproj
       - name: Genera icona e splash
         script: |
           npx @capacitor/assets generate --ios || true
@@ -43,14 +39,16 @@ workflows:
           cd ios/App
           agvtool new-marketing-version "$APP_VERSION"
           agvtool new-version -all "$PROJECT_BUILD_NUMBER"
-      - name: Firma
+      - name: Firma e Compila IPA
         script: |
+          PBX="ios/App/App.xcodeproj/project.pbxproj"
+          sed -i '' "s/com\.getcapacitor\.App/$BUNDLE_ID/g" "$PBX"
+          echo "=== Bundle IDs nel progetto ==="
+          grep PRODUCT_BUNDLE_IDENTIFIER "$PBX" | sort -u
           keychain initialize
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create --verbose
           keychain add-certificates
-          xcode-project use-profiles
-      - name: Compila IPA
-        script: |
+          xcode-project use-profiles --project "ios/App/App.xcodeproj"
           xcode-project build-ipa --project "ios/App/App.xcodeproj" --scheme "App"
     artifacts:
       - "**/*.ipa"
