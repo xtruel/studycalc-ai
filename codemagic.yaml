@@ -7,9 +7,6 @@ workflows:
     integrations:
       app_store_connect: CODEMAGIC_ASC_KEY
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.studycalc.app
       vars:
         BUNDLE_ID: "com.studycalc.app"
         APP_VERSION: "1.0.0"
@@ -42,13 +39,19 @@ workflows:
           cd ios/App
           agvtool new-marketing-version "$APP_VERSION"
           agvtool new-version -all "$PROJECT_BUILD_NUMBER"
-      - name: Forza Bundle ID corretto
+      - name: Firma e Compila IPA
         script: |
-          sed -i '' "s/com\.getcapacitor\.App/$BUNDLE_ID/g" ios/App/App.xcodeproj/project.pbxproj
-      - name: Applica profili di firma
-        script: xcode-project use-profiles
-      - name: Compila IPA
-        script: xcode-project build-ipa --project "ios/App/App.xcodeproj" --scheme "App"
+          set -ex
+          PBX="ios/App/App.xcodeproj/project.pbxproj"
+          sed -i '' "s/com\.getcapacitor\.App/$BUNDLE_ID/g" "$PBX"
+          keychain initialize
+          echo "=== Certificati IOS_DISTRIBUTION esistenti ==="
+          app-store-connect certificates list --type IOS_DISTRIBUTION || true
+          CERT_KEY=$(openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 2>/dev/null)
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --certificate-key="$CERT_KEY" --create --verbose
+          keychain add-certificates
+          xcode-project use-profiles
+          xcode-project build-ipa --project "ios/App/App.xcodeproj" --scheme "App"
     artifacts:
       - "**/*.ipa"
       - /tmp/xcodebuild_logs/*.log
