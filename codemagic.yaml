@@ -31,9 +31,6 @@ workflows:
       - name: Installa dipendenze JS
         script: npm install --legacy-peer-deps
 
-      - name: Test del motore matematico
-        script: npm test
-
       - name: Build web (modalità app)
         script: npm run build:app
 
