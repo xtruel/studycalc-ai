@@ -23,6 +23,10 @@ workflows:
           rm -rf ios
           npx cap add ios
           npx cap sync ios
+      - name: Forza Bundle ID corretto
+        script: |
+          sed -i '' "s/com\.getcapacitor\.App/$BUNDLE_ID/g" ios/App/App.xcodeproj/project.pbxproj
+          grep -m1 PRODUCT_BUNDLE_IDENTIFIER ios/App/App.xcodeproj/project.pbxproj
       - name: Genera icona e splash
         script: |
           npx @capacitor/assets generate --ios || true
