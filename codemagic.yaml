@@ -18,9 +18,9 @@ workflows:
     scripts:
       - name: Installa dipendenze JS
         script: npm install --legacy-peer-deps
-      - name: Build web (modalita app)
+      - name: Build web
         script: npm run build:app
-      - name: Aggiungi iOS e sincronizza
+      - name: Aggiungi iOS e sync
         script: |
           if [ ! -d "ios" ]; then npx cap add ios; fi
           npx cap sync ios
@@ -28,13 +28,13 @@ workflows:
         script: |
           npx @capacitor/assets generate --ios || true
           npx cap sync ios
-      - name: Permessi privacy in Info.plist
+      - name: Permessi privacy
         script: |
           PLIST="ios/App/App/Info.plist"
           add() { /usr/libexec/PlistBuddy -c "Add :$1 string $2" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Set :$1 $2" "$PLIST"; }
           add NSCameraUsageDescription "Usiamo la fotocamera per leggere gli esercizi dalle tue foto, sul dispositivo."
           add NSPhotoLibraryUsageDescription "Accediamo alle foto per leggere gli esercizi dalle immagini selezionate."
-          add NSPhotoLibraryAddUsageDescription "Salviamo eventuali immagini elaborate nella tua galleria."
+          add NSPhotoLibraryAddUsageDescription "Salviamo le immagini elaborate nella tua galleria."
       - name: Versione e build number
         script: |
           cd ios/App
@@ -42,7 +42,7 @@ workflows:
           agvtool new-version -all "$PROJECT_BUILD_NUMBER"
       - name: Installa i Pod
         script: cd ios/App && pod install
-      - name: Firma - crea cert e profilo
+      - name: Firma
         script: |
           keychain initialize
           app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
@@ -52,7 +52,6 @@ workflows:
         script: |
           xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
     artifacts:
-      - studycalc-ai/build/ios/ipa/*.ipa
       - "**/*.ipa"
       - /tmp/xcodebuild_logs/*.log
     publishing:
