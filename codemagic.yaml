@@ -1,3 +1,121 @@
+Skip to content
+xtruel
+studycalc-ai
+Repository navigation
+Code
+Issues
+Pull requests
+Agents
+Actions
+Projects
+Wiki
+Security and quality
+Insights
+Settings
+Files
+Go to file
+t
+T
+studycalc-ai
+67-01-home.png
+67-02-espressione.png
+67-03-precisione.png
+67-04-equazione.png
+ANALISI-PROGETTO.md
+APPSTORE-CHECKLIST.md
+App.tsx
+AppStore-icon-1024.png
+CameraCapture.tsx
+FileUpload.tsx
+HistoryDashboard.tsx
+Logo.tsx
+MathRenderer.tsx
+PUBBLICAZIONE-CLOUD.md
+PresetList.tsx
+README.md
+STORE-LISTING-EN.md
+VisualMathEditor.tsx
+bigdecimal.test.ts
+bigdecimal.ts
+capacitor.config.ts
+codemagic (1).yaml
+codemagic.yaml
+icon-source.svg
+icon.png
+index.css
+index.html
+main.tsx
+metadata.json
+naturalMath.ts
+ocr.ts
+package-lock.json
+package.json
+presets.ts
+solver.test.ts
+solver.ts
+solverI18n.ts
+splash.png
+tsconfig.json
+types.ts
+uiI18n.ts
+vite.config.ts
+vite.standalone.config.ts
+yamlcodemagic.yaml3.0 KB.url
+studycalc-ai
+/
+codemagic.yaml
+in
+main
+
+Edit
+
+Preview
+Indent mode
+
+Spaces
+Indent size
+
+2
+Line wrap mode
+
+No wrap
+Editing codemagic.yaml file contents
+  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
 workflows:
   ios-appstore:
     name: StudyCalc AI - iOS App Store
@@ -34,27 +152,5 @@ workflows:
           add NSCameraUsageDescription "Usiamo la fotocamera per leggere gli esercizi dalle tue foto, sul dispositivo."
           add NSPhotoLibraryUsageDescription "Accediamo alle foto per leggere gli esercizi dalle immagini selezionate."
           add NSPhotoLibraryAddUsageDescription "Salviamo le immagini elaborate nella tua galleria."
-      - name: Versione e build number
-        script: |
-          cd ios/App
-          agvtool new-marketing-version "$APP_VERSION"
-          agvtool new-version -all "$PROJECT_BUILD_NUMBER"
-      - name: Firma e Compila IPA
-        script: |
-          PBX="ios/App/App.xcodeproj/project.pbxproj"
-          sed -i '' "s/com\.getcapacitor\.App/$BUNDLE_ID/g" "$PBX"
-          echo "=== Bundle IDs nel progetto ==="
-          grep PRODUCT_BUNDLE_IDENTIFIER "$PBX" | sort -u
-          keychain initialize
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create --verbose
-          keychain add-certificates
-          xcode-project use-profiles --project "ios/App/App.xcodeproj"
-          xcode-project build-ipa --project "ios/App/App.xcodeproj" --scheme "App"
-    artifacts:
-      - "**/*.ipa"
-      - /tmp/xcodebuild_logs/*.log
-    publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
-        submit_to_app_store: false
+Use Control + Shift + m to toggle the tab key moving focus. Alternatively, use esc then tab to move to the next interactive element on the page.
+ 
