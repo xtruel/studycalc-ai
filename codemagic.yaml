@@ -20,9 +20,10 @@ workflows:
         script: npm install --legacy-peer-deps
       - name: Build web
         script: npm run build:app
-      - name: Aggiungi iOS e sync
+      - name: Aggiungi iOS pulito e sync
         script: |
-          if [ ! -d "ios" ]; then npx cap add ios; fi
+          rm -rf ios
+          npx cap add ios
           npx cap sync ios
       - name: Genera icona e splash
         script: |
