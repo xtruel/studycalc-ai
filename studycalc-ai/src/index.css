@@ -16,6 +16,40 @@ body {
   background-color: #f8fafc;
 }
 
+/* ----------------------------------------------------------------------------
+   Comportamento "app nativa" (iOS/Android): la pagina resta FISSA, si blocca lo
+   zoom a due dita / doppio tap e il rimbalzo elastico. Header e barra in basso
+   restano fermi; scorre solo il contenuto interno (lista messaggi).
+   ---------------------------------------------------------------------------- */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  overscroll-behavior: none;          /* niente "rimbalzo" della pagina */
+  touch-action: pan-x pan-y;          /* niente pinch-zoom */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Riabilita selezione/scrittura dove serve davvero */
+input, textarea, [contenteditable="true"], .selectable {
+  -webkit-user-select: text;
+  user-select: text;
+}
+/* Le aree scrollabili interne scorrono fluide senza propagare il rimbalzo */
+.overflow-y-auto, .overflow-auto, .overflow-y-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
 /* Custom styles for katex/math readability */
 .math-block {
   font-family: var(--font-mono);
