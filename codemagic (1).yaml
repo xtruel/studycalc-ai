@@ -1,0 +1,82 @@
+# =============================================================================
+# StudyCalc AI — Build iOS su Mac in CLOUD (Codemagic).
+# NOTA: i file del progetto sono nella sottocartella "studycalc-ai/" del repo,
+# quindi tutta la build gira lì (working_directory).
+# =============================================================================
+workflows:
+  ios-appstore:
+    name: StudyCalc AI - iOS App Store
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    working_directory: studycalc-ai
+    integrations:
+      app_store_connect: CODEMAGIC_ASC_KEY
+    environment:
+      vars:
+        BUNDLE_ID: "com.studycalc.app"
+        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+        XCODE_SCHEME: "App"
+        APP_VERSION: "1.0.0"
+      node: 20
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Installa dipendenze JS
+        script: npm install --legacy-peer-deps
+
+      - name: Build web (modalità app)
+        script: npm run build:app
+
+      - name: Aggiungi piattaforma iOS e sincronizza
+        script: |
+          if [ ! -d "ios" ]; then npx cap add ios; fi
+          npx cap sync ios
+
+      - name: Genera icona e splash (il tuo logo) per iOS
+        script: |
+          npx @capacitor/assets generate --ios || true
+          npx cap sync ios
+
+      - name: Inserisci i permessi privacy (fotocamera/foto) in Info.plist
+        script: |
+          PLIST="ios/App/App/Info.plist"
+          add() { /usr/libexec/PlistBuddy -c "Add :$1 string $2" "$PLIST" 2>/dev/null \
+                 || /usr/libexec/PlistBuddy -c "Set :$1 $2" "$PLIST"; }
+          add NSCameraUsageDescription "Usiamo la fotocamera per leggere gli esercizi di matematica dalle tue foto, direttamente sul dispositivo."
+          add NSPhotoLibraryUsageDescription "Accediamo alle foto per leggere gli esercizi dalle immagini che selezioni, direttamente sul dispositivo."
+          add NSPhotoLibraryAddUsageDescription "Salviamo eventuali immagini elaborate nella tua galleria."
+
+      - name: Imposta versione e build number
+        script: |
+          cd ios/App
+          agvtool new-marketing-version "$APP_VERSION"
+          agvtool new-version -all "$PROJECT_BUILD_NUMBER"
+
+      - name: Installa i Pod (CocoaPods)
+        script: |
+          cd ios/App && pod install
+
+      - name: Firma — CREA automaticamente certificato e profilo
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
+          xcode-project use-profiles
+
+      - name: Compila l'IPA firmato
+        script: |
+          xcode-project build-ipa \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - studycalc-ai/build/ios/ipa/*.ipa
+      - build/ios/ipa/*.ipa
+      - "**/*.ipa"
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
