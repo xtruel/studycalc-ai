@@ -19,9 +19,6 @@ workflows:
     integrations:
       app_store_connect: CODEMAGIC_ASC_KEY   # <-- nome dell'API key configurata in Codemagic
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.studycalc.app  # <-- DEVE combaciare con capacitor.config.ts e App Store Connect
       vars:
         BUNDLE_ID: "com.studycalc.app"
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
@@ -74,8 +71,14 @@ workflows:
         script: |
           cd ios/App && pod install
 
-      - name: Configura la firma (provisioning automatico via API key)
+      - name: Firma — CREA automaticamente certificato e profilo
         script: |
+          keychain initialize
+          # crea (se non esistono) Bundle ID, certificato di distribuzione e provisioning profile
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
           xcode-project use-profiles
 
       - name: Compila l'IPA firmato
