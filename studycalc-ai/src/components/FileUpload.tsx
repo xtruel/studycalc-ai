@@ -1,5 +1,6 @@
 import { useState, useRef, DragEvent, ChangeEvent } from "react";
 import { Upload, X, FileImage, ImagePlus } from "lucide-react";
+import { downscaleImage } from "../lib/image";
 
 interface FileUploadProps {
   onFileSelect: (base64Image: string | null) => void;
@@ -12,19 +13,22 @@ export default function FileUpload({ onFileSelect, selectedImage, prompt, hint }
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const processFile = (file: File) => {
+  const processFile = async (file: File) => {
     if (!file.type.startsWith("image/")) {
       alert("Si prega di selezionare o trascinare esclusivamente file immagine (PNG, JPEG, GIF, ecc.)!");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        onFileSelect(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    // Ridimensioniamo/ricomprimiamo prima di tenerla in memoria: foto da 12 MP
+    // a piena risoluzione possono saturare la memoria del webview su iPhone vecchi
+    // (pagina bianca). La qualità resta ottima per l'OCR.
+    try {
+      const optimized = await downscaleImage(file);
+      onFileSelect(optimized);
+    } catch (err) {
+      console.error("Ottimizzazione immagine fallita:", err);
+      alert("Non sono riuscito a leggere questa immagine. Prova con un'altra foto.");
+    }
   };
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
