@@ -599,7 +599,7 @@ export default function App() {
             <div className="flex-1 bg-slate-55 dark:bg-slate-900 flex flex-col overflow-hidden relative md:rounded-[2rem] rounded-none">
               
               {/* Header inside the mobile client */}
-              <header className="p-4 bg-white dark:bg-slate-950 border-b border-slate-200/60 dark:border-slate-800 flex items-center justify-between shrink-0 h-14">
+              <header className="px-4 pb-3 bg-white dark:bg-slate-950 border-b border-slate-200/60 dark:border-slate-800 flex items-center justify-between shrink-0" style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" }}>
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg overflow-hidden">
                     <Logo className="w-full h-full" />
@@ -1285,7 +1285,7 @@ export default function App() {
               </div>
 
               {/* HIGH FIDELITY MATERIAL DESIGN 3 BOTTOM ACTIONS NAVBAR */}
-              <nav className="h-16 bg-white dark:bg-slate-950 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-around shrink-0 z-30 select-none">
+              <nav className="min-h-16 pt-2 bg-white dark:bg-slate-950 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-around shrink-0 z-30 select-none" style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.25rem)" }}>
                 
                 <button
                   onClick={() => setActiveTab("chat")}
