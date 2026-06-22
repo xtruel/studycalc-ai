@@ -790,7 +790,8 @@ export function solveLocally(message: string, hasImage: boolean, lang: Lang = "i
   // pulizia + conversione linguaggio naturale → simbolico (parole nelle 6 lingue → operatori)
   const clean = naturalToSymbolic(cleanMessage(original));
 
-  // 1) Immagini: l'OCR richiede un modello AI cloud, non disponibile in locale.
+  // 1) Foto inviata ma l'OCR on-device non ha estratto numeri/matematica leggibile:
+  //    chiediamo una foto migliore o di scrivere l'esercizio (nessun cloud, tutto locale).
   if (hasImage && !/[0-9]/.test(clean)) {
     return imageFallback(T);
   }
