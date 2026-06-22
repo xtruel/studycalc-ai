@@ -16,6 +16,16 @@ workflows:
     scripts:
       - name: Installa dipendenze JS
         script: npm install --legacy-peer-deps
+      - name: OCR piu' preciso (Apple Vision .accurate)
+        script: |
+          SWIFT="node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.swift"
+          if [ -f "$SWIFT" ] && ! grep -q "recognitionLevel" "$SWIFT"; then
+            perl -0pi -e 's/(let textDetectRequest = VNRecognizeTextRequest\(completionHandler: handleDetectedText\)\n)/$1        textDetectRequest.recognitionLevel = .accurate\n        textDetectRequest.usesLanguageCorrection = false\n/' "$SWIFT"
+            echo "Patch OCR applicata:"
+            grep -n "recognitionLevel\|usesLanguageCorrection" "$SWIFT" || echo "ATTENZIONE: patch non applicata (regex non corrisponde)"
+          else
+            echo "Patch OCR gia' presente o file non trovato."
+          fi
       - name: Build web
         script: npm run build:app
       - name: Aggiungi iOS pulito e sync
